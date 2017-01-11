@@ -306,8 +306,8 @@ def inference(images):
 	with tf.variable_scope('global_level_FC1') as scope:
 		reshape = tf.reshape(global_level_conv4, [FLAGS.batch_size, -1])
 		dim = reshape.get_shape()[1].value
-		weights = _variable_with_weight_decay('weights', 
-											  shape=[dim, 1024],
+		weights = _variable_with_weight_decay('weights',
+		                                      shape=[dim, 1024],
 		                                      stddev=0.04,
 		                                      wd=0.004)
 		biases = _variable_on_cpu('biases', [1024], tf.constant_initializer(0.1))
