@@ -135,8 +135,8 @@ def inputs(eval_data):
 		raise ValueError('Please supply a data_dir')
 	data_dir = os.path.join(FLAGS.data_dir, 'cifar-10-batches-bin')
 	images, labels = cifar10_input.inputs(eval_data=eval_data,
-										  data_dir=data_dir,
-										  batch_size=FLAGS.batch_size)
+					      data_dir=data_dir,
+					      batch_size=FLAGS.batch_size)
 	if FLAGS.use_fp16:
 		images = tf.cast(images, tf.float16)
 		labels = tf.cast(labels, tf.float16)
@@ -161,8 +161,8 @@ def inference(images):
 	# low_level_conv1
 	with tf.variable_scope('low_level_conv1') as scope:
 		kernel = _variable_with_weight_decay('weights',
-											 shape=[3, 3, 1, 64],
-											 stddev=5e-2,
+						     shape=[3, 3, 1, 64],
+						     stddev=5e-2,
 		                                     wd=0.0)
 		conv = tf.nn.conv2d(images, kernel, [1, 2, 2, 1], padding='VALID')
 		biases = _variable_on_cpu('biases', [64], tf.constant_initializer(0.0))
@@ -317,7 +317,7 @@ def inference(images):
 	# global_level_FC2
 	with tf.variable_scope('global_level_FC2') as scope:
 		weights = _variable_with_weight_decay('weights',
-											  shape=[1024, 512],
+						      shape=[1024, 512],
 		                                      stddev=0.04,
 		                                      wd=0.004)
 		biases = _variable_on_cpu('biases', [512], tf.constant_initializer(0.1))
@@ -327,9 +327,9 @@ def inference(images):
 	# global_level_FC3
 	with tf.variable_scope('global_level_FC3') as scope:
 		weights = _variable_with_weight_decay('weights',
-											  shape=[512, 256],
-		                                      stddev=0.04,
-		                                      wd=0.004)
+						      shape=[512, 256],
+						      stddev=0.04,
+						      wd=0.004)
 		biases = _variable_on_cpu('biases', [256], tf.constant_initializer(0.1))
 		global_level_FC3 = tf.nn.relu(tf.matmul(global_level_FC2, weights) + biases, name=scope.name)
 		_activation_summary(global_level_FC3)
