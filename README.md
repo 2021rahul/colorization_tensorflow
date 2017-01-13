@@ -2,8 +2,7 @@
 ![Teaser Image](https://raw.githubusercontent.com/satoshiiizuka/siggraph2016_colorization/master/example_results.png)
 
 ## Overview
-
-This code provides an implementation of the [research paper](http://hi.cs.waseda.ac.jp/~iizuka/projects/colorization/data/colorization_sig2016.pdf                                                                                                                                                                                                                                                                                                               ):
+This code provides an implementation of the [research paper](http://hi.cs.waseda.ac.jp/~iizuka/projects/colorization/data/colorization_sig2016.pdf) in python using Tensorflow:
 ```
   "Let there be Color!: Joint End-to-end Learning of Global and Local Image Priors for Automatic Image Colorization with Simultaneous Classification"
   Satoshi Iizuka, Edgar Simo-Serra, and Hiroshi Ishikawa
@@ -15,7 +14,6 @@ This paper provides a method of automatically coloring a grayscale images with a
 See the [project page](http://hi.cs.waseda.ac.jp/~iizuka/projects/colorization/) for more detailed information.
 
 ## Architecture
-
 ![Network Image](link)
 The Deep netwotk used can be divided into the following sections:
 #### - Low-level Features
@@ -35,3 +33,10 @@ Following are the steps followed while training the network:
 - Pass the grayscale image as input to the model.
 - Compute the MSE between target output and the output of the colorization network.
 - Backpropogate the loss through all the networks(global features, mid-level features & low-level features) to update all the parameters of the model.
+
+## Code Organization
+## input_create.py ##     - creates the dataset for input
+## read_input.py ##       - reads the dataset for input 
+## build_model.py ##      - builds the model
+## model_train.py ##      - trains the model on cpu or gpu
+## model_transform.py ##  - transforms a grayscale to colour image
