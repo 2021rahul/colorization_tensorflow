@@ -18,13 +18,20 @@ See the [project page](http://hi.cs.waseda.ac.jp/~iizuka/projects/colorization/)
 
 ![Network Image](link)
 The Deep netwotk used can be divided into the following sections:
-#### • Low-level Features
+#### - Low-level Features
 It is a 6 layer convolutional neural network which obtains low-level features from the input image, which is fed to both the mid-level features features network as well as global features network.
-#### • Global Image Features
+#### - Global Image Features
 Global image features are obtained by further processing the low-level features with four convolutional layers followed by three fully connected layer.
-#### • Mid-level Features
+#### - Mid-level Features
 The low-level features are processed with two convolutional layers to obtain the mid-level features.
-#### • Fusion Layer
+#### - Fusion Layer
 The global features are concatenated with the local features at each spatial location and processed with a small one layer network.
-#### • Colorization Network
+#### - Colorization Network
 The fused features are processed by a set of convolutional & upsampling layers. The output layer is a convolutional layer with sigmoid transfer function that outputs the chrominance of the grayscale image.
+
+## Method
+Following are the steps followed while training the network:
+- Convert the colour image into grayscale and `CIEL*a*b*` colourspace.
+- Pass the grayscale image as input to the model.
+- Compute the MSE between target output and the output of the colorization network.
+- Backpropogate the loss through all the networks(global features, mid-level features & low-level features) to update all the parameters of the model.
