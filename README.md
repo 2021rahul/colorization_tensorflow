@@ -14,8 +14,8 @@ This paper provides a method of automatically coloring a grayscale images with a
 See the [project page](http://hi.cs.waseda.ac.jp/~iizuka/projects/colorization/) for more detailed information.
 
 ## Architecture
-![Network Image](link)
-The Deep netwotk used can be divided into the following sections:
+![Network Image](https://github.com/2021rahul/colorization_tensorflow/blob/master/img/Architecture.jpg)
+The Deep netwotk used can be divided into the following components:
 #### - Low-level Features
 It is a 6 layer convolutional neural network which obtains low-level features from the input image, which is fed to both the mid-level features features network as well as global features network.
 #### - Global Image Features
@@ -26,6 +26,8 @@ The low-level features are processed with two convolutional layers to obtain the
 The global features are concatenated with the local features at each spatial location and processed with a small one layer network.
 #### - Colorization Network
 The fused features are processed by a set of convolutional & upsampling layers. The output layer is a convolutional layer with sigmoid transfer function that outputs the chrominance of the grayscale image.
+
+The components are all trained in an end-to-end fashion. The chrominance is fused with the luminance to form the out
 
 ## Method
 Following are the steps followed while training the network:
