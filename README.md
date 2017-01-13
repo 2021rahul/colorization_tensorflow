@@ -28,7 +28,7 @@ The global features are concatenated with the local features at each spatial loc
 #### - Colorization Network
 The fused features are processed by a set of convolutional & upsampling layers. The output layer is a convolutional layer with sigmoid transfer function that outputs the chrominance of the grayscale image.
 
-The architecture details are as follows
+The architecture details are as shown below:
 ![Layer details](https://github.com/2021rahul/colorization_tensorflow/blob/master/img/layer_details.jpg)
 
 The components are all trained in an end-to-end fashion. The chrominance is fused with the luminance to form the out
