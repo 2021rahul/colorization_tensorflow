@@ -1,13 +1,9 @@
-# [Let there be Color!: Automatic Colorization of Grayscale Images](http://hi.cs.waseda.ac.jp/~iizuka/projects/colorization/)
-
-[Satoshi Iizuka](http://hi.cs.waseda.ac.jp/~iizuka/index_eng.html)\*, [Edgar Simo-Serra](http://hi.cs.waseda.ac.jp/~esimo/)\*, [Hiroshi Ishikawa](http://www.f.waseda.jp/hfs/indexE.html) (\* equal contribution)
-
+# [Let there be Color!: Automatic Colorization of Grayscale Images]
 ![Teaser Image](https://raw.githubusercontent.com/satoshiiizuka/siggraph2016_colorization/master/example_results.png)
 
 ## Overview
 
 This code provides an implementation of the research paper:
-
 ```
   "Let there be Color!: Joint End-to-end Learning of Global and Local Image Priors for Automatic Image Colorization with Simultaneous Classification"
   Satoshi Iizuka, Edgar Simo-Serra, and Hiroshi Ishikawa
