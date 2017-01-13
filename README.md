@@ -36,7 +36,11 @@ Following are the steps followed while training the network:
 
 ## Code Organization
 **input_create.py**     - creates the dataset for input
+
 **read_input.py**       - reads the dataset for input 
+
 **build_model.py**      - builds the model
+
 **model_train.py**      - trains the model on cpu or gpu
+
 **model_transform.py**  - transforms a grayscale to colour image
