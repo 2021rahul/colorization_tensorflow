@@ -215,13 +215,46 @@ def create_network():
 		global_level_FC3 = tf.nn.relu(tf.matmul(global_level_FC2, weights) + biases, name=scope.name)
 		_activation_summary(global_level_FC3)
 
-	#	
-
-  return softmax_linear
+	# fusion_layer
+	with tf.variable_scope('fusion_layer') as scope:
+		#global_level_FC3 = tf.Variable(tf.ones(256))
+		#mid_level_conv2 = tf.Variable(tf.zeros((28,28,256)))
+		
+		mid_level_conv2_reshaped = tf.reshape(mid_level_conv2,[-1,256])
+		mid_level_conv2_reshaped = tf.unstack(mid_level_conv2_reshaped,axis=0)
+		
+		fusion_level = [tf.concat([see_mid,global_level_FC3],0) for see_mid in mid_level_conv2_reshaped]
+		fusion_level = tf.stack(fusion_level)
+		fusion_level = tf.shape(fusion_level,[28,28,512])
+		
+		kernel = _variable_with_weight_decay('weights',
+											 shape=[1, 1, 512, 256],
+											 stddev=5e-2,
+											 wd=0.0)
+		conv = tf.nn.conv2d(fusion_level, kernel, [1, 1, 1, 1], padding='SAME')
+		biases = _variable_on_cpu('biases', [256], tf.constant_initializer(0.0))
+		pre_activation = tf.nn.bias_add(conv, biases)
+		fusion_layer = tf.nn.relu(pre_activation, name=scope.name)
+		_activation_summary(fusion_layer)
+	
+	# colorization_level_conv1
+	with tf.variable_scope('colorization_level_conv1') as scope:
+		kernel = _variable_with_weight_decay('weights',
+											 shape=[3, 3, 256, 128],
+											 stddev=5e-2,
+											 wd=0.0)
+		conv = tf.nn.conv2d(fusion_layer, kernel, [1, 1, 1, 1], padding='SAME')
+		biases = _variable_on_cpu('biases', [128], tf.constant_initializer(0.0))
+		pre_activation = tf.nn.bias_add(conv, biases)
+		colorization_level_conv1 = tf.nn.relu(pre_activation, name=scope.name)
+		_activation_summary(colorization_level_conv1)
+		
+		
+	return softmax_linear
 
 def loss(logits, labels):
-  labels = tf.cast(labels, tf.int64)
-  cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(
+	labels = tf.cast(labels, tf.int64)
+	cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(
 	  logits=logits, labels=labels, name='cross_entropy_per_example')
   cross_entropy_mean = tf.reduce_mean(cross_entropy, name='cross_entropy')
   tf.add_to_collection('losses', cross_entropy_mean)
