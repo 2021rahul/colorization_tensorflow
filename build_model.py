@@ -247,7 +247,33 @@ def create_network():
 		biases = _variable_on_cpu('biases', [128], tf.constant_initializer(0.0))
 		pre_activation = tf.nn.bias_add(conv, biases)
 		colorization_level_conv1 = tf.nn.relu(pre_activation, name=scope.name)
-		_activation_summary(colorization_level_conv1)
+		colorization_level_conv1_upsampled = tf.image.resize_images(colorization_level_conv1, 56, 56)
+		_activation_summary(colorization_level_conv1_upsampled)
+		
+	# colorization_level_conv2
+	with tf.variable_scope('colorization_level_conv2') as scope:
+		kernel = _variable_with_weight_decay('weights',
+											 shape=[3, 3, 128, 64],
+											 stddev=5e-2,
+											 wd=0.0)
+		conv = tf.nn.conv2d(colorization_level_conv1_upsampled, kernel, [1, 1, 1, 1], padding='SAME')
+		biases = _variable_on_cpu('biases', [64], tf.constant_initializer(0.0))
+		pre_activation = tf.nn.bias_add(conv, biases)
+		colorization_level_conv2 = tf.nn.relu(pre_activation, name=scope.name)
+		_activation_summary(colorization_level_conv2)
+
+	# colorization_level_conv3
+	with tf.variable_scope('colorization_level_conv3') as scope:
+		kernel = _variable_with_weight_decay('weights',
+											 shape=[3, 3, 64, 64],
+											 stddev=5e-2,
+											 wd=0.0)
+		conv = tf.nn.conv2d(colorization_level_conv2, kernel, [1, 1, 1, 1], padding='SAME')
+		biases = _variable_on_cpu('biases', [64], tf.constant_initializer(0.0))
+		pre_activation = tf.nn.bias_add(conv, biases)
+		colorization_level_conv3 = tf.nn.relu(pre_activation, name=scope.name)
+		colorization_level_conv3_upsampled = tf.image.resize_images(colorization_level_conv3, 112, 112)
+		_activation_summary(colorization_level_conv3_upsampled)
 		
 		
 	return softmax_linear
