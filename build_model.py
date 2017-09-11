@@ -301,39 +301,8 @@ def create_network():
 
 	return output_layer
 
-def loss(logits, labels):
-	labels = tf.cast(labels, tf.int64)
-	cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(
-	  logits=logits, labels=labels, name='cross_entropy_per_example')
-  cross_entropy_mean = tf.reduce_mean(cross_entropy, name='cross_entropy')
-  tf.add_to_collection('losses', cross_entropy_mean)
-  return tf.add_n(tf.get_collection('losses'), name='total_loss')
-
-def _add_loss_summaries(total_loss):
-  """Add summaries for losses in CIFAR-10 model.
-
-  Generates moving average for all losses and associated summaries for
-  visualizing the performance of the network.
-
-  Args:
-	total_loss: Total loss from loss().
-  Returns:
-	loss_averages_op: op for generating moving averages of losses.
-  """
-  # Compute the moving average of all individual losses and the total loss.
-  loss_averages = tf.train.ExponentialMovingAverage(0.9, name='avg')
-  losses = tf.get_collection('losses')
-  loss_averages_op = loss_averages.apply(losses + [total_loss])
-
-  # Attach a scalar summary to all individual losses and the total loss; do the
-  # same for the averaged version of the losses.
-  for l in losses + [total_loss]:
-	# Name each loss as '(raw)' and name the moving average version of the loss
-	# as the original loss name.
-	tf.contrib.deprecated.scalar_summary(l.op.name + ' (raw)', l)
-	tf.contrib.deprecated.scalar_summary(l.op.name, loss_averages.average(l))
-
-  return loss_averages_op
+def loss(network_output, output):
+    return tf.losses.mean_squared_error(network_output, output)
 
 
 def train(total_loss, global_step):
@@ -386,23 +355,3 @@ def train(total_loss, global_step):
 	train_op = tf.no_op(name='train')
 
   return train_op
-
-
-# def maybe_download_and_extract():
-#   """Download and extract the tarball from Alex's website."""
-#   dest_directory = FLAGS.data_dir
-#   if not os.path.exists(dest_directory):
-# 	os.makedirs(dest_directory)
-#   filename = DATA_URL.split('/')[-1]
-#   filepath = os.path.join(dest_directory, filename)
-#   if not os.path.exists(filepath):
-# 	def _progress(count, block_size, total_size):
-# 	  sys.stdout.write('\r>> Downloading %s %.1f%%' % (filename,
-# 		  float(count * block_size) / float(total_size) * 100.0))
-# 	  sys.stdout.flush()
-# 	filepath, _ = urllib.request.urlretrieve(DATA_URL, filepath, _progress)
-# 	print()
-# 	statinfo = os.stat(filepath)
-# 	print('Successfully downloaded', filename, statinfo.st_size, 'bytes.')
-
-#   tarfile.open(filepath, 'r:gz').extractall(dest_directory)
