@@ -14,10 +14,7 @@ import matplotlib.pyplot as plt
 import time
 
 IMAGE_SIZE = 224
-NUM_CLASSES = 10
 NUM_EPOCHS = 2
-NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = 50000
-NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = 10000
 EVAL_FREQUENCY = 1
 FLAGS = tf.app.flags.FLAGS
 
@@ -341,11 +338,11 @@ def trainNetwork():
     x_img_test, y_img_test = create(testdirname)
     print("test data complete")
     #logits_test = create_network(X_input_test)
-    
+    batch = tf.Variable(0, dtype=data_type())
     loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=Y_output_train, logits=logits_train))
-    optimizer = tf.train.AdadeltaOptimizer(learning_rate = 0.001, rho = 0.95, epsilon = 1e-08).minimize(loss)
-   # print(sess.run(loss, feed_dict = {X_input_train: x_img_train, Y_output_train: y_img_train}))
-    #learning_rate = tf.train.exponential_decay(INITIAL_LEARNING_RATE, global_step, decay_steps, LEARNING_RATE_DECAY_FACTOR, staircase=True)
+    learning_rate = tf.train.exponential_decay(0.01, batch * FLAGS.batch_size, train_size, 0.95, staircase=True)
+    optimizer = tf.train.AdadeltaOptimizer(INITIAL_LEARNING_RATE, rho = 0.95, epsilon = 1e-08).minimize(loss)
+   # print(sess.run(loss, feed_dict = {X_input_train: x_img_train, Y_output_train: y_img_train})) 
     #sess.run(optimizer, feed_dict = {X_input_train: x_img_train, Y_output_train: y_img_train})    
     start_time = time.time()
     with tf.Session() as sess:
@@ -354,7 +351,6 @@ def trainNetwork():
         sess.run(init)
         for step in xrange(int(NUM_EPOCHS * train_size) // FLAGS.batch_size):
           offset = (step * FLAGS.batch_size) % (train_size - FLAGS.batch_size)
-          #type(x_img_train)
           batch_data = x_temp[offset:(offset + FLAGS.batch_size), :,:,:]
           batch_labels = y_img_train[offset:(offset + FLAGS.batch_size)]
           feed_dict = {X_input_train: batch_data, Y_output_train: batch_labels}
@@ -370,7 +366,6 @@ def trainNetwork():
             print('Step %d (epoch %.2f), %.1f ms' %(step, float(step) * FLAGS.batch_size / train_size, 1000 * elapsed_time / EVAL_FREQUENCY))
             print('Minibatch loss: %.3f' % (l))
             print('Minibatch error: %.1f%%' % error_rate(predictions, batch_labels))
-            
            # print('Minibatch error: %.1f%%' % error_rate(predictions, batch_labels))
            # print('Validation error: %.1f%%' % error_rate(
             #    eval_in_batches(validation_data, sess), validation_labels))
