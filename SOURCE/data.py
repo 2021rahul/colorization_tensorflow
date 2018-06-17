@@ -7,34 +7,37 @@ Created on Thu Feb  8 17:27:28 2018
 
 import pandas as pd
 import numpy as np
+import cv2
 import os
 import config
 
 
 class DATA():
 
-    def __init__(self):
+    def __init__(self, dirname):
+        self.dir_path = os.path.join(config.DATA_DIR, dirname)
+        self.filelist = os.listdir(self.dir_path)
         self.batch_size = config.BATCH_SIZE
+        self.size = len(self.filelist)
         self.data_index = 0
-        self.dataX = None
-        self.dataY = None
-        self.size = None
 
-    def read(self, filename):
-        data = pd.read_csv(os.path.join(config.DATA_DIR, filename), header=None)
-        data = np.asarray(data)
-        self.size, self.num_features = data.shape
-        self.dataX = data[:, :-1]
-        self.dataY = self.dense_to_one_hot(data[:, -1])
-
-    def dense_to_one_hot(self, labels):
-        labels_one_hot = pd.get_dummies(labels)
-        return np.asarray(labels_one_hot, dtype = np.float)
+    def read_img(self, filename):
+        img = cv2.imread(filename, 3)
+        height, width, channels = img.shape
+        greyimg = cv2.cvtColor(cv2.resize(img, (config.IMAGE_SIZE, config.IMAGE_SIZE)), cv2.COLOR_BGR2GRAY)
+        colorimg = cv2.cvtColor(cv2.resize(img, (config.IMAGE_SIZE, config.IMAGE_SIZE)), cv2.COLOR_BGR2LAB)
+        return greyimg, colorimg
 
     def generate_batch(self):
-        batch = np.ndarray(shape=(config.BATCH_SIZE), dtype=np.float32)
-        labels = np.ndarray(shape=(config.BATCH_SIZE, 1), dtype=np.float32)
-        batch = self.dataX[self.data_index:self.data_index+self.batch_size,:]
-        labels = self.dataY[self.data_index:self.data_index+self.batch_size, :]
-        self.data_index = (self.data_index + self.batch_size) % self.size
+        batch = []
+        labels = []
+        for i in range(self.batch_size):
+            filename = os.path.join(config.DATA_DIR, self.dir_path, self.filelist[self.data_index])
+            print(filename)
+            greyimg, colorimg = self.read_img(filename)
+            batch.append(greyimg)
+            labels.append(colorimg)
+            self.data_index = (self.data_index + 1) % self.size
+        batch = np.asarray(batch)
+        labels = np.asarray(labels)
         return batch, labels
