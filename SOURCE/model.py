@@ -7,7 +7,6 @@ Created on Thu Feb  8 17:55:53 2018
 
 import tensorflow as tf
 import config
-import numpy as np
 import neural_network
 import os
 
@@ -16,7 +15,7 @@ class MODEL():
 
     def __init__(self):
         self.inputs = tf.placeholder(shape=[config.BATCH_SIZE, config.IMAGE_SIZE, config.IMAGE_SIZE, 1], dtype=tf.float32)
-        self.labels = tf.placeholder(shape=[config.BATCH_SIZE, config.IMAGE_SIZE, config.IMAGE_SIZE, 3], dtype=tf.float32)
+        self.labels = tf.placeholder(shape=[config.BATCH_SIZE, config.IMAGE_SIZE, config.IMAGE_SIZE, 2], dtype=tf.float32)
         self.loss = None
         self.output = None
 
@@ -94,8 +93,8 @@ class MODEL():
 
     def train(self, data):
         global_step = tf.Variable(0, trainable=False)
-        learning_rate = tf.train.exponential_decay(0.01, global_step, train_size, 0.95, staircase=True)
-        optimizer = tf.train.AdadeltaOptimizer(learning_rate, rho = 0.95, epsilon = 1e-08).minimize(self.loss, global_step)
+        learning_rate = tf.train.exponential_decay(0.01, global_step, data.size, 0.95, staircase=True)
+        optimizer = tf.train.AdadeltaOptimizer(learning_rate, rho=0.95, epsilon=1e-08).minimize(self.loss, global_step)
         saver = tf.train.Saver()
         with tf.Session() as session:
             session.run(tf.global_variables_initializer())
@@ -119,7 +118,11 @@ class MODEL():
         with tf.Session() as session:
             saver = tf.train.Saver()
             saver.restore(session, os.path.join(config.MODEL_DIR, "model" + str(config.BATCH_SIZE) + "_" + str(config.NUM_EPOCHS) + ".ckpt"))
-            for i in range(len(data.dataX)):
-                feed_dict = {self.inputs: [data.dataX[i]]}
-                predicted = np.rint(session.run(self.output, feed_dict=feed_dict))
-                print('Actual:', data.dataY[i], 'Predicted:', predicted)
+            avg_cost = 0
+            for name in data.filelist:
+                filename = os.path.join(config.DATA_DIR, self.dir_path, name)
+                inputs, label = data.read_img(filename)
+                feed_dict = {self.inputs: [inputs]}
+                loss = session.run(self.loss, feed_dict=feed_dict)
+                avg_cost += loss/data.size
+            print("cost =", "{:.3f}".format(avg_cost))

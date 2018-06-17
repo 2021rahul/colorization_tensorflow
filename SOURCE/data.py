@@ -26,7 +26,7 @@ class DATA():
         height, width, channels = img.shape
         greyimg = cv2.cvtColor(cv2.resize(img, (config.IMAGE_SIZE, config.IMAGE_SIZE)), cv2.COLOR_BGR2GRAY)
         colorimg = cv2.cvtColor(cv2.resize(img, (config.IMAGE_SIZE, config.IMAGE_SIZE)), cv2.COLOR_BGR2LAB)
-        return greyimg, colorimg
+        return np.reshape(greyimg, (config.IMAGE_SIZE, config.IMAGE_SIZE, 1)), colorimg[:, :, 1:]
 
     def generate_batch(self):
         batch = []
