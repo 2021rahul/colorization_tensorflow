@@ -87,9 +87,9 @@ class MODEL():
         output_layer = neural_network.Output_Layer(shape=[3, 3, 32, 2], stddev=5e-2, value=0.0)
         logits = output_layer.feed_forward(input_data=h, stride=[1, 1, 1, 1])
 
-        logits_norm = tf.image.convert_image_dtype(logits, tf.float32)
-        self.output = tf.image.resize_images(logits_norm, [224, 224], method=tf.image.ResizeMethod.BICUBIC)
-        self.loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=self.labels, logits=self.output))
+        logits_norm = tf.image.convert_image_dtype(logits, tf.float32)/255.
+        self.output = tf.image.resize_images(logits_norm, [224, 224], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
+        self.loss = tf.reduce_mean(tf.squared_difference(self.labels, self.output))
 
     def train(self, data):
         global_step = tf.Variable(0, trainable=False)
