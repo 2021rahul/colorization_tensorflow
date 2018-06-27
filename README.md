@@ -41,12 +41,11 @@ Following are the steps followed while training the network:
 - Backpropogate the loss through all the networks(global features, mid-level features & low-level features) to update all the parameters of the model.
 
 ## Code Organization
-**input_create.py**     - creates the dataset for input
+**DATASET**   : Folder containing the train and test dataset
 
-**read_input.py**       - reads the dataset for input 
-
-**build_model.py**      - builds the model
-
-**model_train.py**      - trains the model on cpu or gpu
-
-**model_transform.py**  - transforms a grayscale to colour image
+**SOURCE**    : Folder containing the source code.
+- config.py, several model related configurations.
+- data.py, class to load the dataset.
+- model.py, class for model operations.
+- neural_network.py, class of various layers used in the model.
+- main.py, driver program.
