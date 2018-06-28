@@ -9,7 +9,9 @@ import tensorflow as tf
 import config
 import neural_network
 import os
-
+import numpy as np
+import cv2
+from scipy.misc import imsave 
 
 class MODEL():
 
@@ -114,15 +116,34 @@ class MODEL():
             save_path = saver.save(session, os.path.join(config.MODEL_DIR, "model" + str(config.BATCH_SIZE) + "_" + str(config.NUM_EPOCHS) + ".ckpt"))
             print("Model saved in path: %s" % save_path)
 
+    def deprocess(imgs):
+        imgs = imgs * 255
+        imgs[imgs > 255] = 255
+        imgs[imgs < 0] = 0
+        return imgs
+    
+    def reconstruct(batch_X, predicted_Y):
+        global count
+        for i in range(config.BATCH_SIZE):
+            result = np.zeros([config.IMAGE_SIZE, config.IMAGE_SIZE, 3])
+            result[:, :, 0] = batch_X[i]
+            result[:, :, 1:3] = predicted_Y[i]
+            result = cv2.cvtColor(result, cv2.COLOR_Lab2BGR)
+            save_path = os.path.join(config.RESULT, "Img" + str(count))
+            count += 1
+            imsave(save_path, result)
+            
     def test(self, data):
         with tf.Session() as session:
             saver = tf.train.Saver()
             saver.restore(session, os.path.join(config.MODEL_DIR, "model" + str(config.BATCH_SIZE) + "_" + str(config.NUM_EPOCHS) + ".ckpt"))
             avg_cost = 0
-            for name in data.filelist:
-                filename = os.path.join(config.DATA_DIR, self.dir_path, name)
-                inputs, label = data.read_img(filename)
-                feed_dict = {self.inputs: [inputs]}
-                loss = session.run(self.loss, feed_dict=feed_dict)
-                avg_cost += loss/data.size
+            total_batch = int(data.size/config.BATCH_SIZE)
+            for batch in range(total_batch):
+                batch_X, batch_Y = data.generate_batch()
+                feed_dict = {self.inputs: batch_X, self.labels: batch_Y}
+                pred_Y, loss = session.run([self.output, self.loss], feed_dict=feed_dict)
+                pred_Y = self.deprocess(pred_Y)
+                self.reconstruct(batch_X, pred_Y)
+                avg_cost += loss/total_batch
             print("cost =", "{:.3f}".format(avg_cost))
