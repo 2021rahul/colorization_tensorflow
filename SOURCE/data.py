@@ -39,5 +39,5 @@ class DATA():
             labels.append(colorimg)
             self.data_index = (self.data_index + 1) % self.size
         batch = np.asarray(batch)
-        labels = np.asarray(labels)
+        labels = np.asarray(labels)/255.
         return batch, labels
