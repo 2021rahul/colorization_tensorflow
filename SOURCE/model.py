@@ -11,7 +11,7 @@ import neural_network
 import os
 import numpy as np
 import cv2
-from scipy.misc import imsave 
+
 
 class MODEL():
 
@@ -116,13 +116,13 @@ class MODEL():
             save_path = saver.save(session, os.path.join(config.MODEL_DIR, "model" + str(config.BATCH_SIZE) + "_" + str(config.NUM_EPOCHS) + ".ckpt"))
             print("Model saved in path: %s" % save_path)
 
-    def deprocess(imgs):
+    def deprocess(self, imgs):
         imgs = imgs * 255
         imgs[imgs > 255] = 255
         imgs[imgs < 0] = 0
-        return imgs
+        return imgs.astype(np.uint8)
     
-    def reconstruct(batch_X, predicted_Y):
+    def reconstruct(self, batch_X, predicted_Y):
         global count
         for i in range(config.BATCH_SIZE):
             result = np.zeros([config.IMAGE_SIZE, config.IMAGE_SIZE, 3])
@@ -131,7 +131,7 @@ class MODEL():
             result = cv2.cvtColor(result, cv2.COLOR_Lab2BGR)
             save_path = os.path.join(config.RESULT, "Img" + str(count))
             count += 1
-            imsave(save_path, result)
+            cv2.imwrite(save_path, result) 
             
     def test(self, data):
         with tf.Session() as session:
