@@ -129,7 +129,7 @@ class MODEL():
             result[:, :, 0] = batch_X[i]
             result[:, :, 1:3] = predicted_Y[i]
             result = cv2.cvtColor(result, cv2.COLOR_Lab2BGR)
-            save_path = os.path.join(config.RESULT, "Img" + str(count))
+            save_path = os.path.join(config.RESULT, "Img" + str(count) + ".jpg")
             count += 1
             cv2.imwrite(save_path, result) 
             
