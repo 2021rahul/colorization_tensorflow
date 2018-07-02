@@ -11,12 +11,12 @@ import config
 
 if __name__ == "__main__":
     # READ DATA
-    data = data.DATA(config.TRAIN_DIR)
+    train_data = data.DATA(config.TRAIN_DIR)
     # BUILD MODEL
     model = model.MODEL()
     model.build()
     # TRAIN MODEL
-    model.train(data)
+    model.train(train_data)
     # TEST MODEL
-    data = data.DATA(config.TEST_DIR)
-    model.test(data)
+    test_data = data.DATA(config.TEST_DIR)
+    model.test(test_data)
