@@ -5,7 +5,6 @@ Created on Thu Feb  8 17:27:28 2018
 @author: rahul.ghosh
 """
 
-import pandas as pd
 import numpy as np
 import cv2
 import os
@@ -24,20 +23,20 @@ class DATA():
     def read_img(self, filename):
         img = cv2.imread(filename, 3)
         height, width, channels = img.shape
-        greyimg = cv2.cvtColor(cv2.resize(img, (config.IMAGE_SIZE, config.IMAGE_SIZE)), cv2.COLOR_BGR2GRAY)
-        colorimg = cv2.cvtColor(cv2.resize(img, (config.IMAGE_SIZE, config.IMAGE_SIZE)), cv2.COLOR_BGR2LAB)
-        return np.reshape(greyimg, (config.IMAGE_SIZE, config.IMAGE_SIZE, 1)), colorimg[:, :, 1:]
+        labimg = cv2.cvtColor(cv2.resize(img, (config.IMAGE_SIZE, config.IMAGE_SIZE)), cv2.COLOR_BGR2Lab)
+        return np.reshape(labimg[:,:,0], (config.IMAGE_SIZE, config.IMAGE_SIZE, 1)), labimg[:, :, 1:]
 
     def generate_batch(self):
         batch = []
         labels = []
+        filelist = []
         for i in range(self.batch_size):
             filename = os.path.join(config.DATA_DIR, self.dir_path, self.filelist[self.data_index])
-            print(filename)
+            filelist.append(self.filelist[self.data_index])
             greyimg, colorimg = self.read_img(filename)
             batch.append(greyimg)
             labels.append(colorimg)
             self.data_index = (self.data_index + 1) % self.size
-        batch = np.asarray(batch)
-        labels = np.asarray(labels)/255.
-        return batch, labels
+        batch = np.asarray(batch)/255
+        labels = np.asarray(labels)/255
+        return batch, labels, filelist

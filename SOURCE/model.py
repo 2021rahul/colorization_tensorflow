@@ -95,7 +95,7 @@ class MODEL():
 
     def train(self, data):
         global_step = tf.Variable(0, trainable=False)
-        learning_rate = tf.train.exponential_decay(0.01, global_step, data.size, 0.95, staircase=True)
+        learning_rate = tf.train.exponential_decay(0.1, global_step, data.size, 0.95, staircase=True)
         optimizer = tf.train.AdadeltaOptimizer(learning_rate, rho=0.95, epsilon=1e-08).minimize(self.loss, global_step)
         saver = tf.train.Saver()
         with tf.Session() as session:
@@ -106,10 +106,10 @@ class MODEL():
             for epoch in range(config.NUM_EPOCHS):
                 avg_cost = 0
                 for batch in range(total_batch):
-                    batch_X, batch_Y = data.generate_batch()
+                    batch_X, batch_Y, _ = data.generate_batch()
                     feed_dict = {self.inputs: batch_X, self.labels: batch_Y}
                     _, loss_val = session.run([optimizer, self.loss], feed_dict=feed_dict)
-                    print("batch:", batch, " loss: ", loss_val)
+                    #print("batch:", batch, " loss: ", loss_val)
                     avg_cost += loss_val / total_batch
                 print("Epoch:", (epoch + 1), "cost =", "{:.3f}".format(avg_cost))
 
@@ -121,29 +121,25 @@ class MODEL():
         imgs[imgs > 255] = 255
         imgs[imgs < 0] = 0
         return imgs.astype(np.uint8)
-    
-    def reconstruct(self, batch_X, predicted_Y):
-        global count
+
+    def reconstruct(self, batch_X, predicted_Y, filelist):
         for i in range(config.BATCH_SIZE):
-            result = np.zeros([config.IMAGE_SIZE, config.IMAGE_SIZE, 3])
-            result[:, :, 0] = batch_X[i]
-            result[:, :, 1:3] = predicted_Y[i]
+            result = np.concatenate((batch_X[i], predicted_Y[i]), axis=2)
             result = cv2.cvtColor(result, cv2.COLOR_Lab2BGR)
-            save_path = os.path.join(config.RESULT, "Img" + str(count) + ".jpg")
-            count += 1
+            save_path = os.path.join(config.OUT_DIR, filelist[i][:-4] + "reconstructed.jpg")
+            print(save_path)
             cv2.imwrite(save_path, result) 
             
     def test(self, data):
+        saver = tf.train.Saver()
         with tf.Session() as session:
-            saver = tf.train.Saver()
             saver.restore(session, os.path.join(config.MODEL_DIR, "model" + str(config.BATCH_SIZE) + "_" + str(config.NUM_EPOCHS) + ".ckpt"))
             avg_cost = 0
             total_batch = int(data.size/config.BATCH_SIZE)
             for batch in range(total_batch):
-                batch_X, batch_Y = data.generate_batch()
+                batch_X, batch_Y, filelist = data.generate_batch()
                 feed_dict = {self.inputs: batch_X, self.labels: batch_Y}
                 pred_Y, loss = session.run([self.output, self.loss], feed_dict=feed_dict)
-                pred_Y = self.deprocess(pred_Y)
-                self.reconstruct(batch_X, pred_Y)
+                self.reconstruct(self.deprocess(batch_X), self.deprocess(pred_Y), filelist)
                 avg_cost += loss/total_batch
             print("cost =", "{:.3f}".format(avg_cost))
