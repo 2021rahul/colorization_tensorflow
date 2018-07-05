@@ -8,7 +8,7 @@ Created on Thu Feb  8 17:16:29 2018
 import os
 
 # DIRECTORY INFORMATION
-DATASET = "Dogs"
+DATASET = "Gland"
 ROOT_DIR = os.path.abspath('../')
 DATA_DIR = os.path.join(ROOT_DIR, 'DATASET/'+DATASET+'/')
 OUT_DIR = os.path.join(ROOT_DIR, 'RESULT/'+DATASET+'/')

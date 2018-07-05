@@ -77,12 +77,14 @@ class MODEL():
         colorization_level_conv1 = neural_network.Convolution_Layer(shape=[3, 3, 256, 128], stddev=0.1, value=0.1)
         h = colorization_level_conv1.feed_forward(input_data=h, stride=[1, 1, 1, 1])
 
+        h = tf.image.resize_images(h, [56, 56], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
         colorization_level_conv2 = neural_network.Convolution_Layer(shape=[3, 3, 128, 64], stddev=0.1, value=0.1)
         h = colorization_level_conv2.feed_forward(input_data=h, stride=[1, 1, 1, 1])
 
         colorization_level_conv3 = neural_network.Convolution_Layer(shape=[3, 3, 64, 64], stddev=0.1, value=0.1)
         h = colorization_level_conv3.feed_forward(input_data=h, stride=[1, 1, 1, 1])
 
+        h = tf.image.resize_images(h, [112, 112], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
         colorization_level_conv4 = neural_network.Convolution_Layer(shape=[3, 3, 64, 32], stddev=0.1, value=0.1)
         h = colorization_level_conv4.feed_forward(input_data=h, stride=[1, 1, 1, 1])
 
