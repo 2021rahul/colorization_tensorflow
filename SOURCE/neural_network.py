@@ -26,7 +26,7 @@ class Convolution_Layer(Layer):
 
     def feed_forward(self, input_data, stride):
         conv = tf.nn.conv2d(input_data, self.weights, stride, padding="SAME")
-        output_data = tf.nn.relu(tf.nn.bias_add(conv, self.biases))
+        output_data = tf.nn.tanh(tf.nn.bias_add(conv, self.biases))
         return output_data
 
 
