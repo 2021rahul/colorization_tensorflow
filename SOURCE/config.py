@@ -8,11 +8,12 @@ Created on Thu Feb  8 17:16:29 2018
 import os
 
 # DIRECTORY INFORMATION
-DATASET = "Gland"
+DATASET = "Dogs"
 ROOT_DIR = os.path.abspath('../')
 DATA_DIR = os.path.join(ROOT_DIR, 'DATASET/'+DATASET+'/')
 OUT_DIR = os.path.join(ROOT_DIR, 'RESULT/'+DATASET+'/')
 MODEL_DIR = os.path.join(ROOT_DIR, 'MODEL/')
+LOG_DIR = os.path.join(ROOT_DIR, 'LOGS/'+DATASET+'/')
 
 TRAIN_DIR = "train"
 TEST_DIR = "test"
@@ -25,4 +26,6 @@ BATCH_SIZE = 1
 SEED = 128
 
 # TRAINING INFORMATION
-NUM_EPOCHS = 5
+USE_PRETRAINED = False
+PRETRAINED = "Dogsmodel1_100"
+NUM_EPOCHS = 100
